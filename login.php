@@ -6,17 +6,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // SQL to check both admin and user based on the username
-    $sql = "SELECT 'User' AS role,  username, password FROM users WHERE username = ?
+    // SQL to check users, admins, and owners based on the username
+    $sql = "SELECT 'User' AS role, username, password FROM users WHERE username = ?
             UNION
-            SELECT 'Admin' AS role,  username, password FROM admins WHERE username = ?";
+            SELECT 'Admin' AS role, username, password FROM admins WHERE username = ?
+            UNION
+            SELECT 'Owner' AS role, username, password FROM owners WHERE username = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
         die("SQL error: " . $conn->error);
     }
 
-    $stmt->bind_param("ss", $username, $username);
+    $stmt->bind_param("sss", $username, $username, $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -32,8 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Redirect based on the role
             if ($row['role'] === 'Admin') {
                 header("Location: admin_dashboard.php");
-            } else {
+            } elseif ($row['role'] === 'User') {
                 header("Location: user_dashboard.php");
+            } else {
+                header("Location: owner_dashboard.php");
             }
             exit;
         } else {
