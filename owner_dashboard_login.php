@@ -1,22 +1,44 @@
 <?php
+session_start();
 // Include database connection file
 include('connect.php');
 
 // Start session to handle logged-in owner
-session_start();
+
 
 // Check if the owner is logged in
-
+if (!isset($_SESSION['owner_id'])) {
+    header("Location: login.php"); // Redirect to login if not logged in
+    exit;
+}
 
 // Get the owner ID from session
-$owner_id = $_SESSION['owner_id'];
+$owner_id =$_SESSION['owner_id'] ;
 
-// Fetch turfs belonging to the logged-in owner with an 'accepted' status
-$query = "SELECT * FROM turfs WHERE owner_id = '$owner_id' AND status = 'accepted'";
-$result = mysqli_query($conn, $query);
+
+// Fetch the owner's name using prepared statements
+$owner_query = "SELECT username FROM owners WHERE owner_id = ?";
+$owner_stmt = $conn->prepare($owner_query);
+$owner_stmt->bind_param("i", $owner_id);
+$owner_stmt->execute();
+$owner_result = $owner_stmt->get_result();
+
+if ($owner_result && $owner_result->num_rows > 0) {
+    $owner_row = $owner_result->fetch_assoc();
+    $owner_name = $owner_row['username'];
+} else {
+    $owner_name = "Owner"; // Default name if not found
+}
+
+// Fetch turfs belonging to the logged-in owner with an 'accepted' status using prepared statements
+$query = "SELECT * FROM turfs WHERE owner_id = ? AND status = 'accepted'";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $owner_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // Check if the owner has any accepted turfs
-if (mysqli_num_rows($result) == 0) {
+if ($result->num_rows == 0) {
     $message = "You do not have any accepted turfs yet.";
 } else {
     $message = "Here are your accepted turfs:";
@@ -45,8 +67,7 @@ if (mysqli_num_rows($result) == 0) {
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            font-size: 28px;
+        h1, h2 {
             color: #333;
             text-align: center;
         }
@@ -86,22 +107,22 @@ if (mysqli_num_rows($result) == 0) {
 <body>
 
     <div class="container">
-        <h1>Owner Dashboard</h1>
+        <h1>Welcome, <?php echo htmlspecialchars($owner_name); ?>!</h1>
+        <h2>Owner Dashboard</h2>
 
-        <?php if (isset($message)) { echo "<p>$message</p>"; } ?>
+        <?php if (isset($message)) { echo "<p>" . htmlspecialchars($message) . "</p>"; } ?>
 
         <div class="turfs-list">
             <?php
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
                     echo "<div class='turf'>";
-                    echo "<h3>" . $row['turf_name'] . "</h3>";
-                    echo "<p><strong>Location:</strong> " . $row['location'] . "</p>";
-                    echo "<p><strong>Contact:</strong> " . $row['contact'] . "</p>";
-                    echo "<p><strong>Facilities:</strong> " . $row['facilities'] . "</p>";
-                    echo "<p><strong>Operating Hours:</strong> " . $row['operating_hours'] . "</p>";
-                    echo "<p><strong>Status:</strong> " . $row['status'] . "</p>";
-                    echo "<p><strong>Special Notes:</strong> " . $row['special_notes'] . "</p>";
+                    echo "<h3>" . htmlspecialchars($row['turf_name']) . "</h3>";
+                    echo "<p><strong>Location:</strong> " . htmlspecialchars($row['location']) . "</p>";
+                    echo "<p><strong>Contact:</strong> " . htmlspecialchars($row['contact']) . "</p>";
+                    echo "<p><strong>Facilities:</strong> " . htmlspecialchars($row['facilities']) . "</p>";
+                    echo "<p><strong>Operating Hours:</strong> " . htmlspecialchars($row['operating_hours']) . "</p>";
+                    echo "<p><strong>Special Notes:</strong> " . htmlspecialchars($row['special_notes']) . "</p>";
                     echo "</div>";
                 }
             }
