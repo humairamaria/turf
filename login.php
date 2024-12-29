@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: user_dashboard.php");
             } else {
                 $_SESSION['owner_id'] = $row['owner_id'];
-                header("Location: owner_dashboard_login111.php");
+                header("Location: owner_dashboard_login.php");
             }
             exit;
         } else {
