@@ -7,11 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
 
     // SQL to check users, admins, and owners based on the username
-    $sql = "SELECT 'User' AS role, username, password,user_id FROM users WHERE username = ?
+    $sql = "SELECT 'User' AS role, username, password,user_id as id FROM users WHERE username = ?
             UNION
             SELECT 'Admin' AS role, username, password,NULL as admin_id FROM  admins WHERE username = ?
             UNION
-            SELECT 'Owner' AS role, username, password,owner_id FROM owners WHERE username = ?";
+            SELECT 'Owner' AS role, username, password,owner_id as id FROM owners WHERE username = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
@@ -36,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($row['role'] === 'Admin') {
                 header("Location: admin_dashboard.php");
             } elseif ($row['role'] === 'User') {
-                $_SESSION['user_id'] = $row['user_id'];
+                $_SESSION['user_id'] = $row['id'];
                 header("Location: user_dashboard.php");
-            } else {
-                $_SESSION['owner_id'] = $row['owner_id'];
+            } elseif ($row['role'] === 'Owner') {
+                $_SESSION['owner_id'] = $row['id'];
                 header("Location: owner_dashboard_login.php");
             }
             exit;
