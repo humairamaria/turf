@@ -1,34 +1,39 @@
 <?php
 require 'connect.php';
-$message = "";
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT); // Hashing the password
     $email = trim($_POST['email']);
     $contact = trim($_POST['contact']);
+    $turf_name = trim($_POST['turf_name']); // Turf name provided during signup
 
-    
-    $turf_name = trim($_POST['turf_name']); // New field for owner
-
-    // Insert into the 'owners' table (you may want to create a separate table for owners)
-    $sql = "INSERT INTO owners (username, password, email, contact,  turf_name) VALUES (?, ?, ?, ?, ?)";
+    // Insert into the 'owners' table
+    $sql = "INSERT INTO owners (username, password, email, contact, turf_name) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
         $stmt->bind_param("sssss", $username, $password, $email, $contact, $turf_name);
         if ($stmt->execute()) {
-            $message = "<div class='message success'>Owner registered successfully!</div>";
+            // Get the newly created owner's ID
+            $owner_id = $stmt->insert_id;
+
+            // Store the owner_id in the session for direct login
+            $_SESSION['owner_id'] = $owner_id;
+
+            // Redirect to the dashboard
+            header("Location: owner_dashboard.php");
+            exit;
         } else {
-            $message = "<div class='message error'>Error: " . $stmt->error . "</div>";
+            die("Error: " . $stmt->error);
         }
         $stmt->close();
     } else {
-        $message = "<div class='message error'>SQL Error: " . $conn->error . "</div>";
+        die("SQL Error: " . $conn->error);
     }
 }
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
