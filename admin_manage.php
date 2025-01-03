@@ -122,6 +122,11 @@ $result = mysqli_query($conn, $query);
             background-color: #c0392b;
         }
     </style>
+    <script>
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete this turf?");
+        }
+    </script>
 </head>
 <body>
     <h1>Manage Turfs</h1>
@@ -165,7 +170,7 @@ $result = mysqli_query($conn, $query);
                     <td>
                         <input type="hidden" name="turf_id" value="<?php echo $row['turf_id']; ?>">
                         <button type="submit" name="update" class="button update-btn">Update</button>
-                        <button type="submit" name="delete" class="button delete-btn">Delete</button>
+                        <button type="submit" name="delete" class="button delete-btn" onclick="return confirmDelete();">Delete</button>
                     </td>
                 </form>
             </tr>
