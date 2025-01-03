@@ -117,7 +117,7 @@ if (isset($_GET['logout'])) {
             background-color: #c0392b;
         }
 
-        .logout-btn {
+        .logout-btn, .manage-btn {
             padding: 10px 20px;
             font-size: 14px;
             background-color: #3498db; /* Blue color */
@@ -129,9 +129,11 @@ if (isset($_GET['logout'])) {
             text-transform: uppercase;
             display: inline-block;
             margin-top: 20px;
+            margin-right: 10px;
+            text-decoration: none;
         }
 
-        .logout-btn:hover {
+        .logout-btn:hover, .manage-btn:hover {
             background-color: #2980b9;
         }
     </style>
@@ -140,6 +142,7 @@ if (isset($_GET['logout'])) {
     <div class="dashboard-container">
         <h1>Admin Dashboard - Turf Approval</h1>
 
+        <a href="admin_manage.php" class="manage-btn">Manage Turfs</a>
         <a href="?logout=true" class="logout-btn">Logout</a>
 
         <table>
@@ -173,3 +176,4 @@ if (isset($_GET['logout'])) {
     </div>
 </body>
 </html>
+
