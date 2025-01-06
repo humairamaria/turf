@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // SQL to check users, admins, and owners based on the username
     $sql = "SELECT 'User' AS role, username, password,user_id as id FROM users WHERE username = ?
             UNION
-            SELECT 'Admin' AS role, username, password,NULL as admin_id FROM  admins WHERE username = ?
+            SELECT 'Admin' AS role, username, password, admin_id as id FROM  admins WHERE username = ?
             UNION
             SELECT 'Owner' AS role, username, password,owner_id as id FROM owners WHERE username = ?";
     $stmt = $conn->prepare($sql);
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Redirect based on the role
             if ($row['role'] === 'Admin') {
+                $_SESSION['admin_id'] = $row['id'];
                 header("Location: admin_dashboard.php");
             } elseif ($row['role'] === 'User') {
                 $_SESSION['user_id'] = $row['id'];
