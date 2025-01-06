@@ -7,14 +7,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'User') {
     header("Location: login.php");
     exit;
 }
-
+$username = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
-$user_login = $_SESSION['username']; // Assuming you store username in session
-
-// Get current UTC time
-$current_utc = gmdate('Y-m-d H:i:s');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,66 +22,95 @@ $current_utc = gmdate('Y-m-d H:i:s');
             margin: 0;
             padding: 0;
             background-color: #f0f4f8;
+            font-size: 18px;
         }
 
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background-color: #2196f3;
+            padding: 20px 30px;
+            background-color:  #2196f3;
             color: #fff;
-        }
-
-        .header-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .datetime {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.9);
-            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .dashboard-header h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin: 0;
         }
 
         .dashboard-header .menu {
             display: flex;
-            gap: 15px;
+            gap: 20px;
         }
 
         .dashboard-header .menu a {
             color: #fff;
             text-decoration: none;
             font-weight: bold;
+            padding: 10px 15px;
+            background-color: #6bb1f4;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .dashboard-header .menu a:hover {
+            background-color: #529ee0;
+        }
+
+        .logout-btn {
+            padding: 10px 15px;
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .container {
+            margin: 20px;
         }
 
         .filters {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px;
+            padding: 30px;
             background-color: #ffffff;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
 
         .filters input, .filters select, .filters button {
-            padding: 10px;
-            font-size: 14px;
+            padding: 12px;
+            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .filters button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
+        .filters button:hover {
+            background-color: #45a049;
+        }
         .turfs-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 30px;
+            padding: 30px;
         }
 
         .turf-card {
@@ -94,237 +118,490 @@ $current_utc = gmdate('Y-m-d H:i:s');
             border: 1px solid #ddd;
             border-radius: 10px;
             width: 30%;
-            padding: 15px;
+            padding: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .turf-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .turf-card h3 {
             margin-top: 0;
-            color: #333;
+            font-size: 22px;
+            color: #4a90e2;
         }
 
         .turf-card p {
-            margin: 5px 0;
-            color: #666;
+            margin: 10px 0;
+            color: #555;
+            font-size: 16px;
         }
 
         .turf-card button {
-            padding: 10px;
+            padding: 12px;
             background-color: #4caf50;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
 
         .turf-card button:hover {
             background-color: #45a049;
         }
 
-        .logout-btn {
-            padding: 10px;
-            background-color: #e53935;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
 
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-
-        .reset-btn {
-            padding: 10px;
-            background-color: #ff9800;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
-        }
-
-        .reset-btn:hover {
-            background-color: #f57c00;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 20px;
-            background-color: #fff;
+        .modal-content {
+            background-color: #ffffff;
+            padding: 40px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin: 20px 0;
+            width: 90%;
+            max-width: 600px;
+            text-align: left;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .no-results p {
-            margin: 10px 0;
-            color: #666;
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 28px;
+            color: #4a90e2;
+        }
+
+        .modal-content p {
+            font-size: 18px;
+            color: #555;
+            margin: 15px 0;
+        }
+        .modal-content select, .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-buttons button:nth-child(1) {
+            background-color: #f44336;
+        }
+
+        .modal-buttons button:nth-child(2) {
+            background-color: #4a90e2;
+        }
+
+        .modal-buttons button:nth-child(3) {
+            background-color: #4caf50;
+        }
+
+        .modal-buttons button:hover {
+            opacity: 0.9;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Payment method forms */
+        #bkash-form, #nagad-form, #rocket-form, #bank-form {
+            display: none;
+        }
+
+        input[name="payment_method"]:checked + #bkash-form,
+        input[name="payment_method"]:checked + #nagad-form,
+        input[name="payment_method"]:checked + #rocket-form,
+        input[name="payment_method"]:checked + #bank-form {
+            display: block;
         }
     </style>
 </head>
 <body>
     <header class="dashboard-header">
-        <div class="header-info">
-            <h1>Welcome, <?php echo htmlspecialchars($user_login); ?></h1>
-            <p class="datetime">UTC: <?php echo $current_utc; ?></p>
-        </div>
+        <h1>Welcome, <?php echo htmlspecialchars($username);?>!</h1>
         <div class="menu">
-            <a href="#booked">Booked Turfs</a>
-            <a href="#sharing">Sharing Options</a>
+            <a href="turf_history.php">Booked Turfs</a>
+            <a href="sharing.php">Sharing Options</a>
             <form method="POST" action="logout.php" style="display:inline;">
                 <button type="submit" class="logout-btn">Logout</button>
             </form>
         </div>
     </header>
-
     <div class="container">
         <form method="GET" class="filters">
-            <input type="text" name="location" placeholder="Location" value="<?php echo isset($_GET['location']) ? htmlspecialchars($_GET['location']) : ''; ?>">
-            <input type="number" name="min_price" placeholder="Min Price" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>">
-            <input type="number" name="max_price" placeholder="Max Price" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>">
-            <input type="number" name="capacity" placeholder="Capacity" value="<?php echo isset($_GET['capacity']) ? htmlspecialchars($_GET['capacity']) : ''; ?>">
+            <input type="text" name="location" placeholder="Location">
+            <input type="number" name="min_price" placeholder="Min Price">
+            <input type="number" name="max_price" placeholder="Max Price">
+            <input type="number" name="capacity" placeholder="Capacity">
             <select name="time_slot">
                 <option value="">Any Time</option>
                 <?php
                 for ($i = 0; $i < 24; $i++) {
                     $start = sprintf("%02d:00", $i);
                     $end = sprintf("%02d:00", ($i + 1) % 24);
-                    echo "<option value='$start-$end' " . (isset($_GET['time_slot']) && $_GET['time_slot'] == "$start-$end" ? 'selected' : '') . ">$start - $end</option>";
+                    echo "<option value='$start-$end'>$start - $end</option>";
                 }
                 ?>
             </select>
             <button type="submit">Filter</button>
-            <a href="<?php echo $_SERVER['PHP_SELF']; ?>" class="reset-btn">Show All Turfs</a>
         </form>
 
         <section id="available">
             <h2>Available Turfs</h2>
             <div class="turfs-list">
                 <?php
-                $query = "SELECT * FROM turfs WHERE status = 'accepted'";
-                $params = array();
+                $query = "SELECT t.turf_id, t.turf_name, t.location, tt.capacity, tt.price_per_slot, t.opening_time, t.closing_time
+                          FROM turfs t
+                          JOIN turf_types tt ON t.turf_id = tt.turf_id
+                          WHERE t.status = 'accepted'";
 
                 if (!empty($_GET['location'])) {
-                    $location = mysqli_real_escape_string($conn, $_GET['location']);
-                    $query .= " AND location LIKE '%$location%'";
+                    $location = "%" . $_GET['location'] . "%";
+                    $query .= " AND t.location LIKE '$location'";
                 }
 
                 if (!empty($_GET['min_price'])) {
-                    $min_price = (int)$_GET['min_price'];
-                    $query .= " AND price >= $min_price";
+                    $min_price = (float)$_GET['min_price'];
+                    $query .= " AND tt.price_per_slot >= $min_price";
                 }
 
                 if (!empty($_GET['max_price'])) {
-                    $max_price = (int)$_GET['max_price'];
-                    $query .= " AND price <= $max_price";
+                    $max_price = (float)$_GET['max_price'];
+                    $query .= " AND tt.price_per_slot <= $max_price";
                 }
 
                 if (!empty($_GET['capacity'])) {
                     $capacity = (int)$_GET['capacity'];
-                    $query .= " AND capacity >= $capacity";
+                    $query .= " AND tt.capacity >= $capacity";
                 }
 
-                if (!empty($_GET['time_slot'])) {
-                    $time_slot = mysqli_real_escape_string($conn, $_GET['time_slot']);
-                    $query .= " AND time_slot = '$time_slot'";
-                }
+                $result = $conn->query($query);
 
-                $result = mysqli_query($conn, $query);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $turf_name = htmlspecialchars($row['turf_name']);
+                        $location = htmlspecialchars($row['location']);
+                        $price = htmlspecialchars($row['price_per_slot']);
+                        $capacity = htmlspecialchars($row['capacity']);
+                        $turf_id = htmlspecialchars($row['turf_id']);
+                        $opening_time = htmlspecialchars($row['opening_time']);
+                        $closing_time = htmlspecialchars($row['closing_time']);
 
-                if ($result && mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
                         echo "<div class='turf-card'>";
-                        echo "<h3>" . htmlspecialchars($row['turf_name']) . "</h3>";
-                        echo "<p>Location: " . htmlspecialchars($row['location']) . "</p>";
-                        echo "<p>Price: $" . htmlspecialchars($row['price']) . " per hour</p>";
-                        echo "<p>Capacity: " . htmlspecialchars($row['capacity']) . " players</p>";
-                        echo "<form method='POST' action='book_turf.php'>";
-                        echo "<label for='time_slot'>Time Slot:</label>";
-                        echo "<select name='time_slot'>";
-                        for ($i = 0; $i < 24; $i++) {
-                            $start = sprintf("%02d:00", $i);
-                            $end = sprintf("%02d:00", ($i + 1) % 24);
-                            echo "<option value='$start-$end'>$start - $end</option>";
-                        }
-                        echo "</select>";
-                        echo "<label for='share'>Share Turf:</label>";
-                        echo "<input type='checkbox' name='share' value='1'>";
-                        echo "<input type='hidden' name='turf_id' value='" . htmlspecialchars($row['turf_id']) . "'>";
-                        echo "<button type='submit'>Book Now</button>";
+                        echo "<h3>{$turf_name}</h3>";
+                        echo "<p><strong>Location:</strong> {$location}</p>";
+                        echo "<p><strong>Price:</strong> {$price} BDT per slot</p>";
+                        echo "<p><strong>Capacity:</strong> {$capacity} players</p>";
+                        echo "<form method='POST' action='user_dashboard.php'>";
+                        echo "<input type='hidden' name='turf_id' value='{$turf_id}'>";
+                        echo "<input type='hidden' name='turf_name' value='{$turf_name}'>";
+                        echo "<input type='hidden' name='location' value='{$location}'>";
+                        echo "<input type='hidden' name='price' value='{$price}'>";
+                        echo "<input type='hidden' name='capacity' value='{$capacity}'>";
+                        echo "<input type='hidden' name='opening_time' value='{$opening_time}'>";
+                        echo "<input type='hidden' name='closing_time' value='{$closing_time}'>";
+                        echo "<button type='submit' name='see_details'>See Details</button>";
                         echo "</form>";
                         echo "</div>";
                     }
                 } else {
-                    echo "<div class='no-results'>";
                     echo "<p>No turfs available matching your criteria.</p>";
-                    echo "<p>Click 'Show All Turfs' to view all available turfs.</p>";
-                    echo "</div>";
                 }
                 ?>
             </div>
-        </section>
-
-        <section id="sharing">
-            <h2>Sharing Options</h2>
-            <div class="turfs-list">
-                <?php
-                $shared_query = "SELECT b.*, t.turf_name, t.location FROM bookings b JOIN turfs t ON b.turf_id = t.turf_id WHERE b.share = 1 AND b.status = 'pending'";
-                $shared_result = mysqli_query($conn, $shared_query);
-
-                if ($shared_result && mysqli_num_rows($shared_result) > 0) {
-                    while ($row = mysqli_fetch_assoc($shared_result)) {
-                        echo "<div class='turf-card'>";
-                        echo "<h3>" . htmlspecialchars($row['turf_name']) . "</h3>";
-                        echo "<p>Location: " . htmlspecialchars($row['location']) . "</p>";
-                        echo "<p>Time Slot: " . htmlspecialchars($row['time_slot']) . "</p>";
-                        echo "<form method='POST' action='join_sharing.php'>";
-                        echo "<input type='hidden' name='booking_id' value='" . htmlspecialchars($row['booking_id']) . "'>";
-                        echo "<button type='submit'>Join</button>";
-                        echo "</form>";
-                        echo "</div>";
-                    }
-                } else {
-                    echo "<p>No shared turfs available at the moment.</p>";
-                }
-                ?>
-            </div>
-        </section>
-
-        <section id="booked">
-            <h2>Booked Turfs</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Turf Name</th>
-                        <th>Location</th>
-                        <th>Time Slot</                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $history_query = "SELECT b.*, t.turf_name, t.location FROM bookings b JOIN turfs t ON b.turf_id = t.turf_id WHERE b.user_id = '$user_id'";
-                    $history_result = mysqli_query($conn, $history_query);
-
-                    if ($history_result && mysqli_num_rows($history_result) > 0) {
-                        while ($row = mysqli_fetch_assoc($history_result)) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['turf_name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['location']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['time_slot']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['status']) . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='4'>No bookings found.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
         </section>
     </div>
+
+    <?php
+    if (isset($_POST['see_details'])) {
+        $turf_id = htmlspecialchars($_POST['turf_id']);
+        $turf_name = htmlspecialchars($_POST['turf_name']);
+        $location = htmlspecialchars($_POST['location']);
+        $price = htmlspecialchars($_POST['price']);
+        $capacity = htmlspecialchars($_POST['capacity']);
+        $opening_time = htmlspecialchars($_POST['opening_time']);
+        $closing_time = htmlspecialchars($_POST['closing_time']);
+        ?>
+        <div id="details-container" class="modal" style="display: flex;">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('details-container').style.display='none'">&times;</span>
+                <h3 id="details-turf-name"><?php echo $turf_name; ?></h3>
+                <p><strong>Location:</strong> <span id="details-location"><?php echo $location; ?></span></p>
+                <p><strong>Price:</strong> <span id="details-price"><?php echo $price; ?></span> BDT per slot</p>
+                <p><strong>Capacity:</strong> <span id="details-capacity"><?php echo $capacity; ?></span> players</p>
+                <form method="POST" action="submit_payment.php">
+                    <input type="hidden" name="turf_id" value="<?php echo $turf_id; ?>">
+                    <input type="hidden" name="price" value="<?php echo $price; ?>">
+                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>" required>
+                    
+                    <p><strong>Time Slot:</strong>
+                        <select name="time_slot" required>
+                            <?php
+                            $start_time = strtotime($opening_time);
+                            $end_time = strtotime($closing_time);
+                            
+                            // Get unavailable slots (both held and reserved)
+                            $today = date('Y-m-d');
+                            $booked_query = "SELECT time_slot FROM bookings 
+                                            WHERE turf_id = ? 
+                                            AND booking_date = ? 
+                                            AND status IN ('hold', 'reserved')";
+                            $stmt = $conn->prepare($booked_query);
+                            $stmt->bind_param("is", $turf_id, $today);
+                            $stmt->execute();
+                            $booked_result = $stmt->get_result();
+                            $booked_slots = [];
+                            
+                            while($row = $booked_result->fetch_assoc()) {
+                                $booked_slots[] = $row['time_slot'];
+                            }
+                            
+                            // Generate available time slots
+                            while ($start_time < $end_time) {
+                                $slot_start = date('H:i', $start_time);
+                                $slot_end = date('H:i', strtotime('+1 hour', $start_time));
+                                $time_slot = "$slot_start-$slot_end";
+                                
+                                if (!in_array($time_slot, $booked_slots)) {
+                                    echo "<option value='$time_slot'>$slot_start - $slot_end</option>";
+                                }
+                                $start_time = strtotime('+1 hour', $start_time);
+                            }
+                            ?>
+                        </select>
+                    </p>
+                    <input type="hidden" name="booking_date" value="<?php echo $today; ?>">
+                    <button type="submit" name="book" class="book-btn">Book Now</button>
+                </form>
+                <div class="modal-buttons">
+                    <button onclick="document.getElementById('details-container').style.display='none'">Close</button>
+                    <button id="share-turf-btn">Share Turf</button>
+                    <button type="button" onclick="document.getElementById('confirmation-container').style.display='flex'">Book Now</button>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    ?>
+
+    <?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['payment_method'])) {
+        $payment_method = $_POST['payment_method'];
+        if ($payment_method == 'bkash') {
+            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
+                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
+                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
+                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
+            } else {
+                echo "All fields are required for Bkash payment!";
+            }
+        } elseif ($payment_method == 'nagad') {
+            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
+                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
+                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
+                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
+            } else {
+                echo "All fields are required for Nagad payment!";
+            }
+        } elseif ($payment_method == 'rocket') {
+            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
+                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
+                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
+                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
+            } else {
+                echo "All fields are required for Rocket payment!";
+            }
+        } elseif ($payment_method == 'bank') {
+            if (!empty($_POST['card_number']) && !empty($_POST['card_holder_name']) && !empty($_POST['expiry_date']) && !empty($_POST['cvc'])) {
+                echo "Card Number: " . htmlspecialchars($_POST['card_number']) . "<br>";
+                echo "Card Holder Name: " . htmlspecialchars($_POST['card_holder_name']) . "<br>";
+                echo "Expiry Date: " . htmlspecialchars($_POST['expiry_date']) . "<br>";
+                echo "CVC: " . htmlspecialchars($_POST['cvc']) . "<br>";
+            } else {
+                echo "All fields are required for Bank payment!";
+            }
+        } else {
+            echo "Invalid payment method!";
+        }
+    } else {
+        echo "Invalid request!";
+    }
+}
+?>
+    <div id="confirmation-container" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('confirmation-container').style.display='none'">&times;</span>
+            <h3>Are you sure you want to book the turf?</h3>
+            <div class="modal-buttons">
+                <button onclick="document.getElementById('confirmation-container').style.display='none'">No</button>
+                <button type="button" onclick="document.getElementById('confirmation-container').style.display='none'; document.getElementById('payment-container').style.display='flex';">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-container" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('payment-container').style.display='none'">&times;</span>
+            <h3>Choose Payment Method</h3>
+            <form>
+                <label>
+                    <input type="radio" name="payment_method" value="bkash" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Bkash
+                </label><br>
+                <label>
+                    <input type="radio" name="payment_method" value="nagad" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Nagad
+                </label><br>
+                <label>
+                    <input type="radio" name="payment_method" value="rocket" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Rocket
+                </label><br>
+                <label>
+                    <input type="radio" name="payment_method" value="bank" onclick="document.getElementById('bkash-form').style.display='none'; document.getElementById('bank-form').style.display='block';"> Bank
+                </label>
+            </form>
+            <div class="modal-buttons">
+                <button type="button" onclick="document.getElementById('payment-container').style.display='none'; document.getElementById('confirmation-container').style.display='flex';">Back</button>
+                <button type="button" onclick="document.getElementById('payment-container').style.display='none'; document.getElementById('payment-details-container').style.display='flex';">Next</button>
+            </div>
+        </div>
+    </div>
+
+
+  
+        <div id="payment-details-container" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('payment-details-container').style.display='none'">&times;</span>
+        <h3>Payment Details</h3>
+        
+
+        <!-- Bkash Payment Form -->
+        <form id="bkash-form" class="payment-form" action="submit_payment.php" method="post">
+            <input type="hidden" name="payment_method" value="bkash">
+            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
+            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
+            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <label>Phone Number:</label>
+            <input type="number" name="phone_number" required><br>
+            <label>Transaction ID:</label>
+            <input type="text" name="transaction_id" required><br>
+            <label>Amount:</label>
+            <input type="number" name="amount" required><br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Nagad Payment Form -->
+        <form id="nagad-form" class="payment-form" action="submit_payment.php" method="post">
+            <input type="hidden" name="payment_method" value="nagad">
+            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
+            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
+            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <label>Phone Number:</label>
+            <input type="number" name="phone_number" required><br>
+            <label>Transaction ID:</label>
+            <input type="text" name="transaction_id" required><br>
+            <label>Amount:</label>
+            <input type="number" name="amount" required><br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Rocket Payment Form -->
+        <form id="rocket-form" class="payment-form" action="submit_payment.php" method="post">
+            <input type="hidden" name="payment_method" value="rocket">
+            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
+            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
+            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <label>Phone Number:</label>
+            <input type="number" name="phone_number" required><br>
+            <label>Transaction ID:</label>
+            <input type="text" name="transaction_id" required><br>
+            <label>Amount:</label>
+            <input type="number" name="amount" required><br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Bank Payment Form -->
+        <form id="bank-form" class="payment-form" action="submit_payment.php" method="post">
+            <input type="hidden" name="payment_method" value="bank">
+            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
+            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
+            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <label>Card Number:</label>
+            <input type="number" name="card_number" required><br>
+            <label>Card Holder Name:</label>
+            <input type="text" name="card_holder_name" required><br>
+            <label>MM/YY:</label>
+            <input type="text" name="expiry_date" required><br>
+            <label>CVC:</label>
+            <input type="number" name="cvc" required><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+    </div>
+</div>
+
+        <div class="modal-buttons">
+            <button type="button" onclick="document.getElementById('payment-details-container').style.display='none'; document.getElementById('payment-container').style.display='flex';">Back</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to show the confirmation modal
+    function showConfirmationModal() {
+        document.getElementById('confirmation-container').style.display = 'block';
+    }
+
+    // Handle form submission and show payment details form
+    document.querySelector('form[action=""]').onsubmit = function(event) {
+        event.preventDefault();
+        var paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        document.getElementById('payment-container').style.display = 'none';
+        document.getElementById(paymentMethod + '-form').style.display = 'block';
+        document.getElementById('payment-details-container').style.display = 'block';
+    }
+</script>
+
 </body>
 </html>
