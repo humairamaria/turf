@@ -1,20 +1,15 @@
 <?php
-// Database connection
 require 'connect.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Debug: Test database connection
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Handle status update (Approve or Reject)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<pre>POST Data: " . print_r($_POST, true) . "</pre>"; // Debug: Check POST data
-
-    if (isset($_POST['id']) && isset($_POST['action'])) {
-        $booking_id = $_POST['id'];
+    if (isset($_POST['booking_id']) && isset($_POST['action'])) {
+        $booking_booking_id = $_POST['booking_id'];
         $action = $_POST['action'];
 
         if ($action === 'approve') {
@@ -22,42 +17,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'reject') {
             $status = 'rejected';
         } else {
-            die("Invalid action.");
+            die("Invalid booking_id action.");
         }
 
-        $sql = "UPDATE bookings SET status = ? WHERE id = ?";
+        $sql = "UPDATE bookings SET status = ? WHERE booking_id = ?";
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
-            die("Prepare failed: " . $conn->error); // Debug: Check prepare error
+            die("Prepare failed: " . $conn->error);
         }
-        $stmt->bind_param("si", $status, $booking_id);
+        $stmt->bind_param("si", $status, $booking_booking_id);
 
         if ($stmt->execute()) {
-            // Debug: Successful query
-            echo "<script>alert('Booking status updated successfully!');</script>";
-            header("Location: " . $_SERVER['PHP_SELF']); // Redirect to refresh page
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
-            die("Error executing query: " . $stmt->error); // Debug: SQL error
+            die("Error executing query: " . $stmt->error);
         }
         $stmt->close();
-    } else {
-        echo "Required POST parameters are missing.";
     }
 }
 
-// Fetch all bookings
-$sql = "SELECT bookings.id, users.username AS user_name, 
+$sql = "SELECT bookings.booking_id, users.username AS user_name, 
         turfs.turf_name AS turf_name, bookings.booking_date, 
         bookings.time_slot, bookings.status 
-        FROM bookings
-        JOIN users ON bookings.user_id = users.user_id
-        JOIN turfs ON bookings.turf_id = turfs.turf_id
+        FROM bookings 
+        JOIN users ON bookings.user_id = users.user_id 
+        JOIN turfs ON bookings.turf_id = turfs.turf_id 
         ORDER BY bookings.booking_date DESC";
 
 $result = $conn->query($sql);
 if (!$result) {
-    die("Error fetching bookings: " . $conn->error); // Debug: SQL error
+    die("Error fetching bookings: " . $conn->error);
 }
 ?>
 
@@ -65,52 +55,70 @@ if (!$result) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="wbooking_idth=device-wbooking_idth, initial-scale=1.0">
     <title>Manage Bookings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 20px;
+            color: #666;
         }
         table {
-            width: 100%;
+            wbooking_idth: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solbooking_id #ddd;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
         .action-buttons button {
             margin: 0 5px;
-            padding: 5px 10px;
+            padding: 8px 15px;
             cursor: pointer;
+            border: none;
+            border-radius: 4px;
         }
         .action-buttons button[value="approve"] {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            border-radius: 3px;
         }
         .action-buttons button[value="reject"] {
             background-color: #f44336;
             color: white;
-            border: none;
-            border-radius: 3px;
         }
     </style>
 </head>
 <body>
+    <div class="user-info">
+        <p>Current Date and Time (UTC): <?php echo date('Y-m-d H:i:s'); ?></p>
+        <p>Current User's Login: <?php echo htmlspecialchars('humairamaria'); ?></p>
+    </div>
+
     <h1>Manage Bookings</h1>
 
     <table>
         <thead>
             <tr>
-                <th>Booking ID</th>
+                <th>Booking booking_id</th>
                 <th>User</th>
                 <th>Turf</th>
                 <th>Date</th>
@@ -124,7 +132,7 @@ if (!$result) {
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>
-                            <td>" . htmlspecialchars($row['id']) . "</td>
+                            <td>" . htmlspecialchars($row['booking_id']) . "</td>
                             <td>" . htmlspecialchars($row['user_name']) . "</td>
                             <td>" . htmlspecialchars($row['turf_name']) . "</td>
                             <td>" . htmlspecialchars($row['booking_date']) . "</td>
@@ -132,7 +140,7 @@ if (!$result) {
                             <td>" . htmlspecialchars($row['status']) . "</td>
                             <td class='action-buttons'>
                                 <form method='post' style='display:inline-block;'>
-                                    <input type='hidden' name='id' value='" . htmlspecialchars($row['id']) . "'>
+                                    <input type='hbooking_idden' name='booking_id' value='" . htmlspecialchars($row['booking_id']) . "'>
                                     <button type='submit' name='action' value='approve'>Approve</button>
                                     <button type='submit' name='action' value='reject'>Reject</button>
                                 </form>
@@ -148,4 +156,4 @@ if (!$result) {
 
     <?php $conn->close(); ?>
 </body>
-</html>                                                              
+</html>
