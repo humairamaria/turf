@@ -9,23 +9,27 @@ if ($conn->connect_error) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['booking_id']) && isset($_POST['action'])) {
-        $booking_booking_id = $_POST['booking_id'];
+        $booking_id = $_POST['booking_id'];
         $action = $_POST['action'];
 
         if ($action === 'approve') {
-            $status = 'reserved';
+            // Update both status and payment_status
+            $sql = "UPDATE bookings SET status = 'reserved', payment_status = 'paid' WHERE booking_id = ?";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                die("Prepare failed: " . $conn->error);
+            }
+            $stmt->bind_param("i", $booking_id);
         } elseif ($action === 'reject') {
-            $status = 'rejected';
+            $sql = "UPDATE bookings SET status = 'rejected' WHERE booking_id = ?";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                die("Prepare failed: " . $conn->error);
+            }
+            $stmt->bind_param("i", $booking_id);
         } else {
-            die("Invalid booking_id action.");
+            die("Invalid action.");
         }
-
-        $sql = "UPDATE bookings SET status = ? WHERE booking_id = ?";
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            die("Prepare failed: " . $conn->error);
-        }
-        $stmt->bind_param("si", $status, $booking_booking_id);
 
         if ($stmt->execute()) {
             header("Location: " . $_SERVER['PHP_SELF']);
@@ -37,12 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Modified SELECT query to only show pending requests
 $sql = "SELECT bookings.booking_id, users.username AS user_name, 
         turfs.turf_name AS turf_name, bookings.booking_date, 
         bookings.time_slot, bookings.status 
         FROM bookings 
         JOIN users ON bookings.user_id = users.user_id 
         JOIN turfs ON bookings.turf_id = turfs.turf_id 
+        WHERE bookings.status = 'pending'  
         ORDER BY bookings.booking_date DESC";
 
 $result = $conn->query($sql);
@@ -55,7 +61,7 @@ if (!$result) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="wbooking_idth=device-wbooking_idth, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Bookings</title>
     <style>
         body {
@@ -73,13 +79,13 @@ if (!$result) {
             color: #666;
         }
         table {
-            wbooking_idth: 100%;
+            width: 100%;
             border-collapse: collapse;
             background-color: white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         th, td {
-            border: 1px solbooking_id #ddd;
+            border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
@@ -105,20 +111,26 @@ if (!$result) {
             background-color: #f44336;
             color: white;
         }
+        .no-requests {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="user-info">
-        <p>Current Date and Time (UTC): <?php echo date('Y-m-d H:i:s'); ?></p>
-        <p>Current User's Login: <?php echo htmlspecialchars('humairamaria'); ?></p>
+        
     </div>
 
-    <h1>Manage Bookings</h1>
+    <h1>Pending Booking Requests</h1>
 
+    <?php if ($result->num_rows > 0): ?>
     <table>
         <thead>
             <tr>
-                <th>Booking booking_id</th>
+                <th>Booking ID</th>
                 <th>User</th>
                 <th>Turf</th>
                 <th>Date</th>
@@ -128,31 +140,30 @@ if (!$result) {
             </tr>
         </thead>
         <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>
-                            <td>" . htmlspecialchars($row['booking_id']) . "</td>
-                            <td>" . htmlspecialchars($row['user_name']) . "</td>
-                            <td>" . htmlspecialchars($row['turf_name']) . "</td>
-                            <td>" . htmlspecialchars($row['booking_date']) . "</td>
-                            <td>" . htmlspecialchars($row['time_slot']) . "</td>
-                            <td>" . htmlspecialchars($row['status']) . "</td>
-                            <td class='action-buttons'>
-                                <form method='post' style='display:inline-block;'>
-                                    <input type='hbooking_idden' name='booking_id' value='" . htmlspecialchars($row['booking_id']) . "'>
-                                    <button type='submit' name='action' value='approve'>Approve</button>
-                                    <button type='submit' name='action' value='reject'>Reject</button>
-                                </form>
-                            </td>
-                        </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='7'>No bookings found.</td></tr>";
-            }
-            ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($row['booking_id']); ?></td>
+                    <td><?php echo htmlspecialchars($row['user_name']); ?></td>
+                    <td><?php echo htmlspecialchars($row['turf_name']); ?></td>
+                    <td><?php echo htmlspecialchars($row['booking_date']); ?></td>
+                    <td><?php echo htmlspecialchars($row['time_slot']); ?></td>
+                    <td><?php echo htmlspecialchars($row['status']); ?></td>
+                    <td class='action-buttons'>
+                        <form method='post' style='display:inline-block;'>
+                            <input type='hidden' name='booking_id' value='<?php echo htmlspecialchars($row['booking_id']); ?>'>
+                            <button type='submit' name='action' value='approve'>Approve</button>
+                            <button type='submit' name='action' value='reject'>Reject</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
         </tbody>
     </table>
+    <?php else: ?>
+        <div class="no-requests">
+            <p>No pending booking requests at this time.</p>
+        </div>
+    <?php endif; ?>
 
     <?php $conn->close(); ?>
 </body>
