@@ -122,6 +122,21 @@ if ($result->num_rows == 0) {
         .tournament-btn:hover {
             background-color: #45a049;
         }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +147,9 @@ if ($result->num_rows == 0) {
         
         <div class="btn-container">
             <a href="tournament_history.php" class="tournament-btn">Tournament History</a>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+             <a href="owner_bookCheck.php" class="btn">View Your Turf Bookings</a>
         </div>
 
         <?php if (isset($message)) { echo "<p>" . htmlspecialchars($message) . "</p>"; } ?>
