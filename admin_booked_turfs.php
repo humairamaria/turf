@@ -2,45 +2,45 @@
 session_start();
 include('connect.php');
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php');
     exit;
 }
 
-// Handle deletion
+
 if (isset($_POST['delete_booking'])) {
     $booking_id = $_POST['booking_id'];
     
     try {
-        // Start transaction
+        
         $conn->begin_transaction();
 
-        // Delete payment record first (due to foreign key constraint)
+       
         $delete_payment = "DELETE FROM payments WHERE booking_id = ?";
         $stmt_payment = $conn->prepare($delete_payment);
         $stmt_payment->bind_param("i", $booking_id);
         $stmt_payment->execute();
 
-        // Then delete booking record
+        
         $delete_booking = "DELETE FROM bookings WHERE booking_id = ?";
         $stmt_booking = $conn->prepare($delete_booking);
         $stmt_booking->bind_param("i", $booking_id);
         $stmt_booking->execute();
 
-        // Commit transaction
+        
         $conn->commit();
 
-        // Show success message
+        
         echo "<script>alert('Booking deleted successfully!');</script>";
     } catch (Exception $e) {
-        // Rollback on error
+        
         $conn->rollback();
         echo "<script>alert('Error deleting booking: " . $e->getMessage() . "');</script>";
     }
 }
 
-// Fetch all bookings ordered by newest first
+
 $query = "SELECT b.booking_id, b.turf_id, b.user_id, b.booking_date, b.time_slot, 
                  b.status, b.created_at, t.turf_name, u.username, p.payment_method, 
                  p.amount, p.transaction_id
@@ -52,7 +52,7 @@ $query = "SELECT b.booking_id, b.turf_id, b.user_id, b.booking_date, b.time_slot
 
 $result = $conn->query($query);
 
-// Your existing notification queries remain the same
+
 $tournament_request_query = "SELECT COUNT(*) AS pending_tournament_requests FROM tournament_requests WHERE status = 'pending'";
 $tournament_request_result = $conn->query($tournament_request_query);
 $pending_tournament_requests = $tournament_request_result->fetch_assoc()['pending_tournament_requests'];
@@ -70,10 +70,7 @@ $pending_turf_requests = $turf_request_result->fetch_assoc()['pending_turf_reque
     <title>Admin Bookings</title>
     <!-- Your existing styles remain the same, just add these new styles -->
     <style>
-        /* Your existing styles here... */
-
-        /* New styles for delete button */
-      /* General Styles */
+      
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f7fc;
@@ -81,7 +78,7 @@ body {
     padding: 0;
 }
 
-/* Main Content Styles */
+
 .main-content {
     margin-left: 220px;
     padding: 20px;
@@ -152,7 +149,7 @@ body {
     border: 1px solid #ddd;
 }
 
-/* Delete Button Styles */
+
 .delete-btn {
     background-color: #dc3545;
     color: white;
@@ -167,7 +164,7 @@ body {
     background-color: #c82333;
 }
 
-/* Confirmation Modal Styles */
+
 .modal {
     display: none;
     position: fixed;
@@ -221,7 +218,7 @@ body {
     background-color: #5a6268;
 }
 
-/* Modal Close Button Styles */
+
 .modal-content button {
     font-size: 16px;
 }
@@ -252,9 +249,7 @@ body {
     </style>
 </head>
 <body>
-    <!-- Your existing sidebar remains the same -->
-
-    <!-- Main Content -->
+   
     <div class="main-content">
         <div class="bookings-header">
             <h1>All Bookings</h1>
@@ -310,7 +305,7 @@ body {
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
+  
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h3>Confirm Deletion</h3>
@@ -326,7 +321,7 @@ body {
     </div>
 
     <script>
-    // Your existing search function remains the same
+ 
 
     function confirmDelete(bookingId) {
         document.getElementById('deleteModal').style.display = 'block';
@@ -337,7 +332,7 @@ body {
         document.getElementById('deleteModal').style.display = 'none';
     }
 
-    // Close modal if clicking outside
+    
     window.onclick = function(event) {
         var modal = document.getElementById('deleteModal');
         if (event.target == modal) {
