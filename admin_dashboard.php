@@ -2,28 +2,28 @@
 session_start();
 include('connect.php');
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php'); // Redirect to login page if not logged in
     exit;
 }
 
-// Fetch the admin's name from the session
+
 $admin_name = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 
-// Logout logic
+
 if (isset($_GET['logout'])) {
     session_destroy();
     header('Location: login.php'); // Redirect to login page after logout
     exit;
 }
 
-// Fetch the count of pending tournament requests
+
 $tournament_request_query = "SELECT COUNT(*) AS pending_tournament_requests FROM tournament_requests WHERE status = 'pending'";
 $tournament_request_result = $conn->query($tournament_request_query);
 $pending_tournament_requests = $tournament_request_result->fetch_assoc()['pending_tournament_requests'];
 
-// Fetch the count of pending turf requests
+
 $turf_request_query = "SELECT COUNT(*) AS pending_turf_requests FROM turfs WHERE status = 'pending'";
 $turf_request_result = $conn->query($turf_request_query);
 $pending_turf_requests = $turf_request_result->fetch_assoc()['pending_turf_requests'];
@@ -95,7 +95,6 @@ $pending_turf_requests = $turf_request_result->fetch_assoc()['pending_turf_reque
             border-radius: 50%;
         }
 
-        /* Main content styling */
         .main-content {
             margin-left: 250px;
             padding: 20px;
@@ -144,7 +143,7 @@ $pending_turf_requests = $turf_request_result->fetch_assoc()['pending_turf_reque
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
+ 
     <div class="sidebar">
         <h2><a href="admin_profile.php">Admin Panel</a></h2>
         <a href="admin_manage.php">Manage Turf</a>
