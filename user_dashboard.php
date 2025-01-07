@@ -2,6 +2,7 @@
 session_start();
 include 'connect.php';
 
+
 // Check if the user is logged in and is a User
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'User') {
     header("Location: login.php");
@@ -566,6 +567,7 @@ function togglePaymentFields(paymentMethod) {
         });
     }
 }
+
 </script>
 
 <?php } ?>
