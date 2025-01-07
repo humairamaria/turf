@@ -354,41 +354,59 @@ $user_id = $_SESSION['user_id'];
     </div>
 
     <?php
-    if (isset($_POST['see_details'])) {
-        $turf_id = htmlspecialchars($_POST['turf_id']);
-        $turf_name = htmlspecialchars($_POST['turf_name']);
-        $location = htmlspecialchars($_POST['location']);
-        $price = htmlspecialchars($_POST['price']);
-        $capacity = htmlspecialchars($_POST['capacity']);
-        $opening_time = htmlspecialchars($_POST['opening_time']);
-        $closing_time = htmlspecialchars($_POST['closing_time']);
-        ?>
-        <div id="details-container" class="modal" style="display: flex;">
-            <div class="modal-content">
-                <span class="close" onclick="document.getElementById('details-container').style.display='none'">&times;</span>
-                <h3 id="details-turf-name"><?php echo $turf_name; ?></h3>
-                <p><strong>Location:</strong> <span id="details-location"><?php echo $location; ?></span></p>
-                <p><strong>Price:</strong> <span id="details-price"><?php echo $price; ?></span> BDT per slot</p>
-                <p><strong>Capacity:</strong> <span id="details-capacity"><?php echo $capacity; ?></span> players</p>
-                <form method="POST" action="submit_payment.php">
-                    <input type="hidden" name="turf_id" value="<?php echo $turf_id; ?>">
-                    <input type="hidden" name="price" value="<?php echo $price; ?>">
-                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>" required>
-                    
-                    <p><strong>Time Slot:</strong>
-                        <select name="time_slot" required>
+if (isset($_POST['see_details'])) {
+    $turf_id = htmlspecialchars($_POST['turf_id']);
+    $turf_name = htmlspecialchars($_POST['turf_name']);
+    $location = htmlspecialchars($_POST['location']);
+    $price = htmlspecialchars($_POST['price']);
+    $capacity = htmlspecialchars($_POST['capacity']);
+    $opening_time = htmlspecialchars($_POST['opening_time']);
+    $closing_time = htmlspecialchars($_POST['closing_time']);
+?>
+    <div id="details-container" class="modal" style="display: flex;">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('details-container').style.display='none'">&times;</span>
+            <h3><?php echo $turf_name; ?></h3>
+            <p><strong>Location:</strong> <?php echo $location; ?></p>
+            <p><strong>Price:</strong> <?php echo $price; ?> BDT per slot</p>
+            <p><strong>Capacity:</strong> <?php echo $capacity; ?> players</p>
+
+            <!-- Single Consolidated Form -->
+            <form method="POST" action="submit_payment.php" class="payment-form">
+                <!-- Hidden Fields -->
+                <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
+                <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
+                <input type="hidden" name="price" value="<?php echo htmlspecialchars($price); ?>">
+
+                <!-- Booking Section -->
+                <div class="booking-section">
+                    <div class="form-group">
+                        <label>Select Date:</label>
+                        <select name="booking_date" required class="form-control">
+                            <?php
+                            for($i = 0; $i < 7; $i++) {
+                                $date = date('Y-m-d', strtotime("+$i days"));
+                                $display_date = date('d M Y', strtotime("+$i days"));
+                                echo "<option value='{$date}'>{$display_date}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Time Slot:</label>
+                        <select name="time_slot" required class="form-control">
                             <?php
                             $start_time = strtotime($opening_time);
                             $end_time = strtotime($closing_time);
                             
-                            // Get unavailable slots (both held and reserved)
-                            $today = date('Y-m-d');
+                            // Get booked slots
                             $booked_query = "SELECT time_slot FROM bookings 
-                                            WHERE turf_id = ? 
-                                            AND booking_date = ? 
-                                            AND status IN ('hold', 'reserved')";
+                                           WHERE turf_id = ? 
+                                           AND booking_date = CURDATE()
+                                           AND status IN ('hold', 'reserved')";
                             $stmt = $conn->prepare($booked_query);
-                            $stmt->bind_param("is", $turf_id, $today);
+                            $stmt->bind_param("i", $turf_id);
                             $stmt->execute();
                             $booked_result = $stmt->get_result();
                             $booked_slots = [];
@@ -397,7 +415,6 @@ $user_id = $_SESSION['user_id'];
                                 $booked_slots[] = $row['time_slot'];
                             }
                             
-                            // Generate available time slots
                             while ($start_time < $end_time) {
                                 $slot_start = date('H:i', $start_time);
                                 $slot_end = date('H:i', strtotime('+1 hour', $start_time));
@@ -410,198 +427,145 @@ $user_id = $_SESSION['user_id'];
                             }
                             ?>
                         </select>
-                    </p>
-                    <input type="hidden" name="booking_date" value="<?php echo $today; ?>">
-                    <button type="submit" name="book" class="book-btn">Book Now</button>
-                </form>
-                <div class="modal-buttons">
-                    <button onclick="document.getElementById('details-container').style.display='none'">Close</button>
-                    <button id="share-turf-btn">Share Turf</button>
-                    <button type="button" onclick="document.getElementById('confirmation-container').style.display='flex'">Book Now</button>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <?php
-    }
-    ?>
 
-    <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['payment_method'])) {
-        $payment_method = $_POST['payment_method'];
-        if ($payment_method == 'bkash') {
-            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
-                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
-                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
-                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
-            } else {
-                echo "All fields are required for Bkash payment!";
-            }
-        } elseif ($payment_method == 'nagad') {
-            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
-                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
-                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
-                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
-            } else {
-                echo "All fields are required for Nagad payment!";
-            }
-        } elseif ($payment_method == 'rocket') {
-            if (!empty($_POST['phone_number']) && !empty($_POST['transaction_id']) && !empty($_POST['amount'])) {
-                echo "Phone Number: " . htmlspecialchars($_POST['phone_number']) . "<br>";
-                echo "Transaction ID: " . htmlspecialchars($_POST['transaction_id']) . "<br>";
-                echo "Amount: " . htmlspecialchars($_POST['amount']) . "<br>";
-            } else {
-                echo "All fields are required for Rocket payment!";
-            }
-        } elseif ($payment_method == 'bank') {
-            if (!empty($_POST['card_number']) && !empty($_POST['card_holder_name']) && !empty($_POST['expiry_date']) && !empty($_POST['cvc'])) {
-                echo "Card Number: " . htmlspecialchars($_POST['card_number']) . "<br>";
-                echo "Card Holder Name: " . htmlspecialchars($_POST['card_holder_name']) . "<br>";
-                echo "Expiry Date: " . htmlspecialchars($_POST['expiry_date']) . "<br>";
-                echo "CVC: " . htmlspecialchars($_POST['cvc']) . "<br>";
-            } else {
-                echo "All fields are required for Bank payment!";
-            }
-        } else {
-            echo "Invalid payment method!";
-        }
-    } else {
-        echo "Invalid request!";
-    }
-}
-?>
-    <div id="confirmation-container" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="document.getElementById('confirmation-container').style.display='none'">&times;</span>
-            <h3>Are you sure you want to book the turf?</h3>
-            <div class="modal-buttons">
-                <button onclick="document.getElementById('confirmation-container').style.display='none'">No</button>
-                <button type="button" onclick="document.getElementById('confirmation-container').style.display='none'; document.getElementById('payment-container').style.display='flex';">Yes</button>
-            </div>
-        </div>
-    </div>
+                <!-- Payment Section -->
+                <div class="payment-section">
+                    <div class="form-group">
+                        <label>Payment Method:</label>
+                        <select name="payment_method" required onchange="togglePaymentFields(this.value)">
+                            <option value="">Select Payment Method</option>
+                            <option value="bkash">bKash</option>
+                            <option value="nagad">Nagad</option>
+                            <option value="rocket">Rocket</option>
+                        </select>
+                    </div>
 
-    <div id="payment-container" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="document.getElementById('payment-container').style.display='none'">&times;</span>
-            <h3>Choose Payment Method</h3>
-            <form>
-                <label>
-                    <input type="radio" name="payment_method" value="bkash" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Bkash
-                </label><br>
-                <label>
-                    <input type="radio" name="payment_method" value="nagad" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Nagad
-                </label><br>
-                <label>
-                    <input type="radio" name="payment_method" value="rocket" onclick="document.getElementById('bkash-form').style.display='block'; document.getElementById('bank-form').style.display='none';"> Rocket
-                </label><br>
-                <label>
-                    <input type="radio" name="payment_method" value="bank" onclick="document.getElementById('bkash-form').style.display='none'; document.getElementById('bank-form').style.display='block';"> Bank
-                </label>
+                    <div id="payment-fields" class="payment-fields" style="display:none;">
+                        <div class="form-group">
+                            <label>Phone Number:</label>
+                            <input type="text" name="phone_number" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Transaction ID:</label>
+                            <input type="text" name="transaction_id" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount:</label>
+                            <input type="number" name="amount" value="<?php echo htmlspecialchars($price); ?>" readonly required class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Confirm Booking</button>
+                </div>
             </form>
-            <div class="modal-buttons">
-                <button type="button" onclick="document.getElementById('payment-container').style.display='none'; document.getElementById('confirmation-container').style.display='flex';">Back</button>
-                <button type="button" onclick="document.getElementById('payment-container').style.display='none'; document.getElementById('payment-details-container').style.display='flex';">Next</button>
-            </div>
         </div>
     </div>
 
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
-  
-        <div id="payment-details-container" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="document.getElementById('payment-details-container').style.display='none'">&times;</span>
-        <h3>Payment Details</h3>
-        
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
 
-        <!-- Bkash Payment Form -->
-        <form id="bkash-form" class="payment-form" action="submit_payment.php" method="post">
-            <input type="hidden" name="payment_method" value="bkash">
-            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
-            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-            <label>Phone Number:</label>
-            <input type="number" name="phone_number" required><br>
-            <label>Transaction ID:</label>
-            <input type="text" name="transaction_id" required><br>
-            <label>Amount:</label>
-            <input type="number" name="amount" required><br>
-            <button type="submit">Submit</button>
-        </form>
+.payment-form {
+    margin-top: 20px;
+}
 
-        <!-- Nagad Payment Form -->
-        <form id="nagad-form" class="payment-form" action="submit_payment.php" method="post">
-            <input type="hidden" name="payment_method" value="nagad">
-            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
-            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-            <label>Phone Number:</label>
-            <input type="number" name="phone_number" required><br>
-            <label>Transaction ID:</label>
-            <input type="text" name="transaction_id" required><br>
-            <label>Amount:</label>
-            <input type="number" name="amount" required><br>
-            <button type="submit">Submit</button>
-        </form>
+.form-group {
+    margin-bottom: 20px;
+}
 
-        <!-- Rocket Payment Form -->
-        <form id="rocket-form" class="payment-form" action="submit_payment.php" method="post">
-            <input type="hidden" name="payment_method" value="rocket">
-            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
-            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-            <label>Phone Number:</label>
-            <input type="number" name="phone_number" required><br>
-            <label>Transaction ID:</label>
-            <input type="text" name="transaction_id" required><br>
-            <label>Amount:</label>
-            <input type="number" name="amount" required><br>
-            <button type="submit">Submit</button>
-        </form>
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
 
-        <!-- Bank Payment Form -->
-        <form id="bank-form" class="payment-form" action="submit_payment.php" method="post">
-            <input type="hidden" name="payment_method" value="bank">
-            <input type="hidden" name="turf_id" value="<?php echo htmlspecialchars($turf_id); ?>">
-            <input type="hidden" name="booking_date" value="<?php echo htmlspecialchars($booking_date); ?>">
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-            <label>Card Number:</label>
-            <input type="number" name="card_number" required><br>
-            <label>Card Holder Name:</label>
-            <input type="text" name="card_holder_name" required><br>
-            <label>MM/YY:</label>
-            <input type="text" name="expiry_date" required><br>
-            <label>CVC:</label>
-            <input type="number" name="cvc" required><br>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-</div>
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
 
-    </div>
-</div>
+.payment-fields {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
 
-        <div class="modal-buttons">
-            <button type="button" onclick="document.getElementById('payment-details-container').style.display='none'; document.getElementById('payment-container').style.display='flex';">Back</button>
-        </div>
-    </div>
-</div>
+.submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.submit-btn:hover {
+    background-color: #45a049;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close:hover {
+    color: #333;
+}
+</style>
 
 <script>
-    // Function to show the confirmation modal
-    function showConfirmationModal() {
-        document.getElementById('confirmation-container').style.display = 'block';
+function togglePaymentFields(paymentMethod) {
+    const paymentFields = document.getElementById('payment-fields');
+    const inputs = paymentFields.querySelectorAll('input');
+    
+    if (paymentMethod) {
+        paymentFields.style.display = 'block';
+        inputs.forEach(input => {
+            if (input.type !== 'hidden' && input.name !== 'amount') {
+                input.required = true;
+            }
+        });
+    } else {
+        paymentFields.style.display = 'none';
+        inputs.forEach(input => {
+            input.required = false;
+        });
     }
-
-    // Handle form submission and show payment details form
-    document.querySelector('form[action=""]').onsubmit = function(event) {
-        event.preventDefault();
-        var paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-        document.getElementById('payment-container').style.display = 'none';
-        document.getElementById(paymentMethod + '-form').style.display = 'block';
-        document.getElementById('payment-details-container').style.display = 'block';
-    }
+}
 </script>
 
-</body>
-</html>
+<?php } ?>
