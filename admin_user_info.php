@@ -2,13 +2,13 @@
 session_start();
 include('connect.php');
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php');
     exit;
 }
 
-// Handle user deletion
+
 if (isset($_POST['delete_user'])) {
     $user_id = $_POST['user_id'];
     
@@ -16,25 +16,24 @@ if (isset($_POST['delete_user'])) {
         // Start transaction
         $conn->begin_transaction();
 
-        // Delete user from users table
+        
         $delete_user = "DELETE FROM users WHERE user_id = ?";
         $stmt_user = $conn->prepare($delete_user);
         $stmt_user->bind_param("i", $user_id);
         $stmt_user->execute();
 
-        // Commit transaction
         $conn->commit();
 
-        // Show success message
+  
         echo "<script>alert('User deleted successfully!');</script>";
     } catch (Exception $e) {
-        // Rollback on error
+        
         $conn->rollback();
         echo "<script>alert('Error deleting user: " . $e->getMessage() . "');</script>";
     }
 }
 
-// Handle user update
+
 if (isset($_POST['update_user'])) {
     $user_id = $_POST['user_id'];
     $username = $_POST['username'];
@@ -42,19 +41,19 @@ if (isset($_POST['update_user'])) {
     $role = $_POST['role'];
 
     try {
-        // Start transaction
+       
         $conn->begin_transaction();
 
-        // Update user in users table
+      
         $update_user = "UPDATE users SET username = ?, email = ?, role = ? WHERE user_id = ?";
         $stmt_user = $conn->prepare($update_user);
         $stmt_user->bind_param("sssi", $username, $email, $role, $user_id);
         $stmt_user->execute();
 
-        // Commit transaction
+
         $conn->commit();
 
-        // Show success message
+
         echo "<script>alert('User updated successfully!');</script>";
     } catch (Exception $e) {
         // Rollback on error
@@ -63,7 +62,7 @@ if (isset($_POST['update_user'])) {
     }
 }
 
-// Fetch all registered users
+
 $query = "SELECT user_id, username, email FROM users ORDER BY user_id DESC";
 $result = $conn->query($query);
 ?>
