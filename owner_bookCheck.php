@@ -2,7 +2,7 @@
 session_start();
 include('connect.php');
 
-// Check if the owner is logged in
+
 if (!isset($_SESSION['owner_id'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +10,7 @@ if (!isset($_SESSION['owner_id'])) {
 
 $owner_id = $_SESSION['owner_id'];
 
-// Fetch all turfs owned by the logged-in owner with their bookings
+
 $query = "
     SELECT 
         t.turf_id, 
@@ -29,7 +29,7 @@ $stmt->bind_param("i", $owner_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Organize the data by turf
+
 $turf_bookings = [];
 while ($row = $result->fetch_assoc()) {
     $turf_id = $row['turf_id'];
