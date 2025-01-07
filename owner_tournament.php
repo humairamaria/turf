@@ -2,7 +2,7 @@
 session_start();
 include('connect.php');
 
-// Ensure owner is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Owner') {
     header('Location: login.php');
     exit;
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $owner_id = $_SESSION['owner_id']; // Assuming owner's ID is in session
 
-    // Insert tournament request
+ 
     $query = "INSERT INTO tournament_requests (turf_id, owner_id, tournament_name, start_date, end_date, description)
               VALUES ('$turf_id', '$owner_id', '$tournament_name', '$start_date', '$end_date', '$description')";
     mysqli_query($conn, $query);
