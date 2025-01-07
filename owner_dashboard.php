@@ -2,17 +2,17 @@
 require 'connect.php';
 session_start();
 
-// Check if the owner is logged in
+
 if (!isset($_SESSION['owner_id'])) {
-    // Redirect to login page if not logged in
+   
     header("Location: login.php");
     exit;
 }
 
-// Get the logged-in owner's ID from the session
+
 $owner_id = $_SESSION['owner_id'];
 
-// Fetch the owner's details from the database
+
 $sql = "SELECT username, turf_name FROM owners WHERE owner_id = ?";
 $stmt = $conn->prepare($sql);
 if ($stmt) {
@@ -38,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $closing_time_24hr = date("H:i:s", strtotime($closing_time_12hr));
     
     $special_notes = $_POST['special_notes'];
-    $status = 'pending'; // Ensure this value is valid for the status column
+    $status = 'pending'; 
 
-    // Insert into turfs table
+    
     $query = "INSERT INTO turfs (turf_name, location, contact, facilities, opening_time, closing_time, special_notes, owner_id, status)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             $turf_id = $stmt->insert_id;
 
-            // Insert type-specific details for each turf type
+            
             foreach ($_POST['turf_types'] as $type) {
                 $type_name = $type['type_name'];
                 $capacity = max(0, $type['capacity']);
