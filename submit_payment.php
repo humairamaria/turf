@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get form data
+  
     $turf_id = $_POST['turf_id'] ?? null;
     $user_id = $_SESSION['user_id'] ?? null;
     $booking_date = $_POST['booking_date'] ?? null;
@@ -26,10 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
-        // Start transaction
+        
         $conn->begin_transaction();
 
-        // Check if the slot exists in the bookings table
+        
         $check_sql = "SELECT 1 FROM bookings 
                       WHERE turf_id = ? 
                       AND booking_date = ? 
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $check_result = $check_stmt->get_result();
 
         if ($check_result->num_rows > 0) {
-            // Slot already exists in the bookings table
+          
             echo "<div class='message-container error'>
                     <div class='message-text'>The selected time slot is already booked.</div>
                     <button onclick='window.location.href=\"user_dashboard.php\"' class='back-btn'>Back to Dashboard</button>
@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;  // Stop the process if the slot exists
         }
 
-        // Insert the booking with 'hold' status since the slot is available
+      
         $insert_sql = "INSERT INTO bookings (turf_id, user_id, booking_date, time_slot, status) 
                        VALUES (?, ?, ?, ?, 'hold')";
         $insert_stmt = $conn->prepare($insert_sql);
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insert_stmt->execute();
         $booking_id = $insert_stmt->insert_id;
 
-        // If payment details are provided, update status to 'reserved'
+      
         if ($payment_method && $phone_number && $transaction_id && $amount) {
             $payment_sql = "INSERT INTO payments (booking_id, payment_method, phone_number, transaction_id, amount) 
                             VALUES (?, ?, ?, ?, ?)";
@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_stmt->execute();
         }
 
-        // Commit transaction
+ 
         $conn->commit();
 
         echo "<div class='message-container success'>
