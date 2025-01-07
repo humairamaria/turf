@@ -3,7 +3,7 @@ session_start();
 include 'connect.php';
 
 
-
+// Check if the user is logged in and is a User
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'User') {
     header("Location: login.php");
     exit;
@@ -281,7 +281,7 @@ $user_id = $_SESSION['user_id'];
         <h1>Welcome, <?php echo htmlspecialchars($username);?>!</h1>
         <div class="menu">
             <a href="turf_history.php">Booked Turfs</a>
-            <a href="sharing.php">Sharing Options</a>
+            
             <form method="POST" action="logout.php" style="display:inline;">
                 <button type="submit" class="logout-btn">Logout</button>
             </form>
