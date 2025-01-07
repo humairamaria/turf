@@ -2,13 +2,13 @@
 session_start();
 include('connect.php');
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php'); // Redirect to login page if not logged in
     exit;
 }
 
-// Update or Delete Logic
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update'])) {
         $turf_id = $_POST['turf_id'];
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $location = $_POST['location'];
         $operating_hours = $_POST['operating_hours'];
 
-        // Update turf details in the `turfs` table
+      
         $update_turf_query = "
             UPDATE turfs 
             SET turf_name = '$turf_name', location = '$location', operating_hours = '$operating_hours' 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slot_duration = $_POST['slot_duration'];
         $capacity = $_POST['capacity'];
 
-        // Update type-specific details in the `turf_types` table
+       
         $update_type_query = "
             UPDATE turf_types 
             SET price_per_slot = '$price_per_slot', slot_duration = '$slot_duration', capacity = '$capacity' 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $turf_id = $_POST['turf_id'];
 
-        // Delete turf from `turf_types` and `turfs`
+       
         $delete_type_query = "DELETE FROM turf_types WHERE turf_id = '$turf_id'";
         mysqli_query($conn, $delete_type_query);
 
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch turfs and their corresponding turf types
+
 $query = "
     SELECT t.turf_id, t.turf_name, t.owner_id, t.location, tt.price_per_slot, tt.slot_duration, tt.capacity, 
            tt.type_name AS turf_type, t.operating_hours
