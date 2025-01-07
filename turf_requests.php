@@ -2,17 +2,17 @@
 session_start();
 include('connect.php');
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php'); // Redirect to login page if not logged in
     exit;
 }
 
-// Fetch all turfs with 'pending' status
+
 $query = "SELECT * FROM turfs WHERE status = 'pending'";
 $result = mysqli_query($conn, $query);
 
-// Handle accept or decline actions for turf requests
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['accept'])) {
         $turf_id = $_POST['turf_id'];
@@ -24,14 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['decline'])) {
         $turf_id = $_POST['turf_id'];
-        // Update turf status to 'declined'
+       
         $update_query = "UPDATE turfs SET status = 'declined' WHERE turf_id = '$turf_id'";
         mysqli_query($conn, $update_query);
         echo "<script>alert('Turf declined!'); window.location.href='turf_requests.php';</script>";
     }
 }
 
-// Logout logic
+
 if (isset($_GET['logout'])) {
     session_destroy();
     header('Location: login.php'); // Redirect to login page after logout
