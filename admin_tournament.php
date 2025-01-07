@@ -6,13 +6,13 @@ require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Ensure admin is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php');
     exit;
 }
 
-// Your existing PHP code for handling POST requests remains the same...
+
 ?>
 
 <!DOCTYPE html>
