@@ -244,6 +244,24 @@ $user_id = $_SESSION['user_id'];
         .close:hover {
             color: #333;
         }
+        .back-btn, .submit-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        }
+
+        .back-btn {
+        background-color: #f44336; /* Red color for back button */
+        }
+
+        .back-btn:hover {
+        background-color: #d32f2f; /* Darker red on hover */
+        }
 
         /* Payment method forms */
         #bkash-form, #nagad-form, #rocket-form, #bank-form {
@@ -269,6 +287,12 @@ $user_id = $_SESSION['user_id'];
             </form>
         </div>
     </header>
+    <div class="dashboard-header">
+        <div class="menu">
+            <!-- Other menu options -->
+            <a href="user_profile.php" class="btn-profile">My Profile</a>
+        </div>
+    </div>
     <div class="container">
         <form method="GET" class="filters">
             <input type="text" name="location" placeholder="Location">
@@ -467,85 +491,74 @@ if (isset($_POST['see_details'])) {
     </div>
 
 <style>
+/* Modal container adjustments */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;  /* Set a max width for better fit */
+    height: auto;
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
+/* Modal content adjustments */
 .modal-content {
     background-color: #fff;
-    padding: 30px;
+    padding: 15px;  /* Reduced padding */
     border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 100%;
     position: relative;
+    overflow-y: auto;
+    max-height: 80vh;  /* Ensure the form is shorter and fits the screen */
 }
 
-.payment-form {
-    margin-top: 20px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #333;
-}
-
+/* Form control adjustments */
 .form-control {
     width: 100%;
-    padding: 10px;
+    padding: 8px;  /* Reduced padding */
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;  /* Smaller font size */
+    margin-bottom: 10px; /* Add margin to separate fields */
 }
 
-.payment-fields {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-}
-
+/* Submit button adjustments */
 .submit-btn {
     background-color: #4CAF50;
     color: white;
-    padding: 12px 24px;
+    padding: 8px 16px;  /* Reduced padding */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
-    font-size: 16px;
-    margin-top: 20px;
+    font-size: 14px;
+    margin-top: 10px;
 }
 
-.submit-btn:hover {
-    background-color: #45a049;
+/* Additional adjustments for small screens */
+@media (max-width: 768px) {
+    .modal {
+        width: 95%;
+    }
+    .modal-content {
+        padding: 10px;
+    }
+    .form-control {
+        font-size: 12px;
+    }
+    .submit-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
 }
 
-.close {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-}
-
-.close:hover {
-    color: #333;
-}
 </style>
 
 <script>
