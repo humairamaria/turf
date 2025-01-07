@@ -183,7 +183,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
 </head>
 <body>
     <div class="container">
-        <a href="admin_profile.php" class="back-btn">← Back to Dashboard</a>
+        <a href="admin_dashboard.php" class="back-btn">← Back to Dashboard</a>
         <h1>Tournament Requests</h1>
 
         <?php if(mysqli_num_rows($result) > 0): ?>
