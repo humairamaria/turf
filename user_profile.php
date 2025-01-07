@@ -2,7 +2,7 @@
 session_start();
 include 'connect.php';
 
-// Ensure the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch user details
+
 $stmt = $conn->prepare("SELECT username, email, contact FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_email = $_POST['email'];
         $new_contact = $_POST['contact'];
 
-        // Update user details
+       
         $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, contact = ? WHERE user_id = ?");
         $stmt->bind_param("sssi", $new_username, $new_email, $new_contact, $user_id);
 
@@ -42,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_password = $_POST['new_password'];
         $confirm_password = $_POST['confirm_password'];
 
-        // Fetch the current password from the database
         $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -50,14 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->fetch();
         $stmt->close();
 
-        // Verify the current password
+        
         if (password_verify($current_password, $hashed_password)) {
-            // Check if new password and confirm password match
+          
             if ($new_password === $confirm_password) {
-                // Hash the new password
+               
                 $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-                // Update the password in the database
                 $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
                 $stmt->bind_param("si", $new_hashed_password, $user_id);
 
