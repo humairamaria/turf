@@ -1,0 +1,481 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Jan 08, 2025 at 12:25 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `turf`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admins`
+--
+
+CREATE TABLE `admins` (
+  `username` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `contact` int(20) NOT NULL,
+  `admin_id` int(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admins`
+--
+
+INSERT INTO `admins` (`username`, `email`, `password`, `contact`, `admin_id`) VALUES
+('Humaira', 'humaira.binte.moshiur@g.bracu.ac.bd', '$2y$10$dvyNYcynsYCAxi6vlv2b2eZzWXJ1HxsVVzUDDfhjNdLgpioL2Y5fW', 1915485110, 1),
+('ifaz_7', 'ifaz@gmail.com', '$2y$10$WTd1wPiJPlgw9TN1w2xIYO5xk2fhxfMq6wqfR.Qh3c5tGEWllvjje', 0, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookings`
+--
+
+CREATE TABLE `bookings` (
+  `booking_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `turf_id` int(11) NOT NULL,
+  `booking_date` datetime NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `payment_status` varchar(20) NOT NULL DEFAULT 'paid',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `time_slot` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`booking_id`, `user_id`, `turf_id`, `booking_date`, `status`, `payment_status`, `created_at`, `updated_at`, `time_slot`) VALUES
+(2, 14, 6, '2025-01-06 00:00:00', 'reserved', 'paid', '2025-01-06 00:21:35', '2025-01-06 00:33:22', ''),
+(5, 15, 6, '2025-01-09 00:00:00', 'reserved', 'paid', '2025-01-07 16:45:48', '2025-01-07 23:24:18', '08:00-09:00'),
+(24, 15, 6, '2025-01-10 00:00:00', 'reserved', 'paid', '2025-01-07 19:28:13', '2025-01-07 23:24:18', '10:00-11:00'),
+(25, 15, 6, '2025-01-10 00:00:00', 'reserved', 'paid', '2025-01-07 19:35:47', '2025-01-07 23:24:18', '14:00-15:00'),
+(26, 15, 6, '2025-01-09 00:00:00', 'reserved', 'paid', '2025-01-07 19:40:00', '2025-01-07 23:24:18', '11:00-12:00'),
+(28, 15, 6, '2025-01-11 00:00:00', 'reserved', 'paid', '2025-01-07 19:54:50', '2025-01-07 23:24:19', '08:00-09:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owners`
+--
+
+CREATE TABLE `owners` (
+  `owner_id` int(100) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `contact` int(100) NOT NULL,
+  `turf_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `owners`
+--
+
+INSERT INTO `owners` (`owner_id`, `first_name`, `last_name`, `username`, `password`, `email`, `contact`, `turf_name`) VALUES
+(1, '', '', 'ahmed', '$2y$10$9bPHG1fBASaT8s4X/j8rtOv0Bg7Yj4PxpNgx3w7OFCUJsDJlq4cZC', 'ahmed@gmail.com', 1913633659, 'sports frenzie'),
+(2, '', '', 'jon', '$2y$10$lK7bynTe0DpnLur.bInyQ.ChUh3gSFm7Thnuik.O77auL57pb4HzK', 'jon@gmail.com', 12856303, 'khelbo'),
+(3, '', '', 'maria', '$2y$10$8stqmr4.l2Uefs1Rx1NCAuWTxjlxqVfOkERRudwgrzr4TU0/o0QW2', 'maria@gmail.com', 91752624, 'khelbooo'),
+(4, '', '', 'munni', '$2y$10$tXPQPCpGvgA4zo9XpYM3IOCs9iVOhBqcru/tpn0k6s2H/OcNg21uq', 'munni@gmai.com', 1977754, 'khulbo'),
+(5, '', '', 'humaira22', '$2y$10$Q0pIv.cFhb9bKTgxbOOD1uU1Y1DrssjupXJfRlNdzMWMoZBFH7Erm', 'humh@hjm.com', 8765467, 'khulbona'),
+(6, '', '', 'humaira22', '$2y$10$nmgdT66L/UQ/DktDUXvFHeNQ0F56ZclBTTzFIJnYWY.rihUxVALCK', 'jhdg@vfg.JH', 345678, 'wdjnedw'),
+(7, '', '', 'alamgir', '$2y$10$ijgNHbX/r8dKex83qWGBTuibR09.3LJeM9o3/Di5xz.CQNPlVCZRS', 'alamgir@gmail.com', 5467890, 'alamgir'),
+(14, '', '', 'shatil', '$2y$10$PF8s97LNJ5GvYhqUAEWBeOGLd8kvhhpsm62IXQthS/pixiw8rxBAe', 'shatil@uhjns.om', 987687, 'khelsi'),
+(15, '', '', 'wasef', '$2y$10$hLC1w6zqUcuqAyiTT6K.E.j.1eQ4KE68maSjftUe0vfUwe1is02ZC', 'wasef@gbhjk.ikjn', 1913633659, 'kheltesi'),
+(16, '', '', 'azmain', '$2y$10$VFrTgIEYYKEFqmaEifOnFuJexyo9RbizuhPFKswJ6LkbNmhA.eHfe', 'azmnj@hjn.vghbjk', 3456987, 'ok'),
+(17, '', '', 'fahmida', '$2y$10$nVTyDxDkzWXVFCm9EacRo.jrESR4YsOBO6IQL7ngqMgGu5dEhuWTO', 'fahmida@jmkod.com', 1747572273, 'basha'),
+(18, '', '', 'akib', '$2y$10$WHeiAVLusARXhXk9jJgzce1.GAa6fr1ZABcmMPpsCkTJ8AY///URq', 'akib@gmail.com', 98765627, 'kheltesi'),
+(19, 'jahid', 'bin moshiur', 'jahid', '$2y$10$3KTuYqgE53g4W9P32aq/0ekEWFfBKNbfUBjddiO6oDuUZkFxhgb/a', 'hattimatimtim02@gmail.com', 1681093989, 'wowzie');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payments`
+--
+
+CREATE TABLE `payments` (
+  `id` int(11) NOT NULL,
+  `payment_method` varchar(50) NOT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `transaction_id` varchar(50) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `card_number` varchar(20) DEFAULT NULL,
+  `card_holder_name` varchar(100) DEFAULT NULL,
+  `expiry_date` varchar(5) DEFAULT NULL,
+  `cvc` varchar(4) DEFAULT NULL,
+  `booking_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`id`, `payment_method`, `phone_number`, `transaction_id`, `amount`, `card_number`, `card_holder_name`, `expiry_date`, `cvc`, `booking_id`, `created_at`) VALUES
+(2, 'bank', NULL, NULL, NULL, '1234567', 'sdxcfvgbh', '1234', '1234', NULL, '2025-01-05 22:59:37'),
+(4, 'bkash', '01915485110', 'hyughjh56', 500.00, NULL, NULL, NULL, NULL, 2, '2025-01-06 00:21:36'),
+(5, 'bkash', '908765678', 'jhjsdxjbsy5b67', 800.00, NULL, NULL, NULL, NULL, 5, '2025-01-07 16:45:48'),
+(16, 'bkash', '908765678', 'hyughjh56', 800.00, NULL, NULL, NULL, NULL, 24, '2025-01-07 19:28:13'),
+(17, 'bkash', '908765678', 'ghbjkhk78', 800.00, NULL, NULL, NULL, NULL, 25, '2025-01-07 19:35:47'),
+(18, 'bkash', '908765678', 'jhjsdxjbsy5b67', 800.00, NULL, NULL, NULL, NULL, 26, '2025-01-07 19:40:00'),
+(20, 'bkash', '908765678', 'kjuhygvhbj', 800.00, NULL, NULL, NULL, NULL, 28, '2025-01-07 19:54:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sign up`
+--
+
+CREATE TABLE `sign up` (
+  `id` int(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sign up`
+--
+
+INSERT INTO `sign up` (`id`, `username`, `password`) VALUES
+(1, 'humaira', 'aaa1');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tournaments`
+--
+
+CREATE TABLE `tournaments` (
+  `tournament_id` int(11) NOT NULL,
+  `turf_id` int(11) NOT NULL,
+  `tournament_name` varchar(255) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tournaments`
+--
+
+INSERT INTO `tournaments` (`tournament_id`, `turf_id`, `tournament_name`, `start_date`, `end_date`, `description`) VALUES
+(1, 7, 'amra khelbo', '2025-01-10', '2025-01-15', 'icchaaaa'),
+(2, 7, 'basha', '2025-01-05', '2025-01-07', 'bolbonaaaa'),
+(3, 7, 'wow', '2025-01-07', '2025-01-10', 'sup bros?'),
+(4, 6, 'kemon dilam', '2025-01-10', '2025-01-23', 'kiree pial ki khobor'),
+(5, 6, 'ok', '2025-01-16', '2025-01-28', 'we are having a football tournament');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tournament_requests`
+--
+
+CREATE TABLE `tournament_requests` (
+  `request_id` int(11) NOT NULL,
+  `turf_id` int(11) NOT NULL,
+  `owner_id` int(11) NOT NULL,
+  `tournament_name` varchar(255) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `description` text DEFAULT NULL,
+  `status` enum('pending','accepted','declined') DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tournament_requests`
+--
+
+INSERT INTO `tournament_requests` (`request_id`, `turf_id`, `owner_id`, `tournament_name`, `start_date`, `end_date`, `description`, `status`) VALUES
+(1, 7, 17, 'amra khelbo', '2025-01-10', '2025-01-15', 'icchaaaa', 'accepted'),
+(2, 7, 17, 'basha', '2025-01-05', '2025-01-07', 'bolbonaaaa', 'accepted'),
+(3, 7, 17, 'wow', '2025-01-07', '2025-01-10', 'sup bros?', 'accepted'),
+(4, 6, 16, 'kemon dilam', '2025-01-10', '2025-01-23', 'kiree pial ki khobor', 'accepted'),
+(5, 6, 16, 'ok', '2025-01-16', '2025-01-28', 'we are having a football tournament', 'accepted');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `turfs`
+--
+
+CREATE TABLE `turfs` (
+  `turf_id` int(11) NOT NULL,
+  `turf_name` varchar(255) NOT NULL,
+  `location` varchar(255) NOT NULL,
+  `contact` varchar(100) NOT NULL,
+  `facilities` text DEFAULT NULL,
+  `operating_hours` varchar(100) DEFAULT NULL,
+  `special_notes` text DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `status` enum('pending','accepted','declined') DEFAULT 'pending',
+  `opening_time` time NOT NULL,
+  `closing_time` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `turfs`
+--
+
+INSERT INTO `turfs` (`turf_id`, `turf_name`, `location`, `contact`, `facilities`, `operating_hours`, `special_notes`, `owner_id`, `status`, `opening_time`, `closing_time`) VALUES
+(1, 'khulbona', 'baridhara', '9876545', 'Floodlights, Parking, Changing Rooms, Equipment Rental', '8-10', 'Full payment must be done to confirm the booking. For further queries please contact us directly.', 1, 'accepted', '08:00:00', '22:00:00'),
+(4, 'sports frenzie', 'aftabnagar', '01747572273', 'Floodlights', '8 AM - 9 AM', 'Full payment must be done to confirm the booking. For further queries please contact us directly.', 1, 'accepted', '10:00:00', '23:00:00'),
+(5, 'khelsi', 'mlibagh', '01913633659', 'Floodlights, Parking', '8-12', 'iytufghbjnk', 15, 'accepted', '09:00:00', '20:00:00'),
+(6, 'ok', 'malibagh', '76548977', 'Floodlights, Equipment Rental', '2-5', 'uytfrdcfgvhjb ', 16, 'accepted', '08:00:00', '18:00:00'),
+(7, 'basha', 'rampura', '01747572273', 'Floodlights, Parking, Changing Rooms, Equipment Rental', '10-12', 'bolbo na', 17, 'accepted', '10:00:00', '24:00:00'),
+(9, 'wowzie', 'khilgaon', '01681093989', 'Parking, Equipment Rental', NULL, 'ki ar bollbo', 19, 'pending', '08:30:00', '22:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `turf_types`
+--
+
+CREATE TABLE `turf_types` (
+  `type_id` int(11) NOT NULL,
+  `turf_id` int(11) DEFAULT NULL,
+  `type_name` varchar(100) DEFAULT NULL,
+  `capacity` int(11) DEFAULT NULL,
+  `price_per_slot` decimal(10,2) DEFAULT NULL,
+  `slot_duration` decimal(3,1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `turf_types`
+--
+
+INSERT INTO `turf_types` (`type_id`, `turf_id`, `type_name`, `capacity`, `price_per_slot`, `slot_duration`) VALUES
+(1, 1, 'Football', 12, 1100.00, 2.0),
+(4, 4, 'Badminton', 4, 900.00, 3.0),
+(10, 5, 'Football', 12, 200.00, 2.0),
+(11, 6, 'Football', 12, 800.00, 2.0),
+(12, 7, 'Football', 12, 900.00, 2.0),
+(14, 9, 'Football', 12, 1200.00, 1.0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(80) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `contact` int(11) NOT NULL,
+  `gender` varchar(10) NOT NULL,
+  `age` int(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `username`, `email`, `password`, `contact`, `gender`, `age`) VALUES
+(12, 'humaira', 'maria', 'humairaa', 'humaira@gmail.com', '$2y$10$rVsIfN19qaA69C5SoNlcg.FWp6iS2VaME.ms48OfjptklSOL9.Smm', 987654, 'Female', 20),
+(14, 'ifaz', 'alamgir', 'zafi', 'ifaz07@gmail.com', '$2y$10$OrZf.Scm8oXJv6BVAxuuuOKecTutgoHPqSScZpPrwuyDOMRQyLGdW', 98, 'Male', 20),
+(15, 'foyshal', 'pial', 'pial', 'imtesharahmed5566@gmail.com', '$2y$10$WTJV4sWKmFBQjcLJgN0PS.fulzRfLgKu27P2x4HSEFmGWGUdeKax2', 187656, 'Male', 18);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `admins`
+--
+ALTER TABLE `admins`
+  ADD PRIMARY KEY (`admin_id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `bookings`
+--
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`booking_id`),
+  ADD UNIQUE KEY `unique_booking_slot` (`turf_id`,`booking_date`,`time_slot`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `owners`
+--
+ALTER TABLE `owners`
+  ADD PRIMARY KEY (`owner_id`);
+
+--
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`);
+
+--
+-- Indexes for table `sign up`
+--
+ALTER TABLE `sign up`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `tournaments`
+--
+ALTER TABLE `tournaments`
+  ADD PRIMARY KEY (`tournament_id`),
+  ADD KEY `turf_id` (`turf_id`);
+
+--
+-- Indexes for table `tournament_requests`
+--
+ALTER TABLE `tournament_requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `turf_id` (`turf_id`),
+  ADD KEY `owner_id` (`owner_id`);
+
+--
+-- Indexes for table `turfs`
+--
+ALTER TABLE `turfs`
+  ADD PRIMARY KEY (`turf_id`),
+  ADD KEY `owner_id` (`owner_id`);
+
+--
+-- Indexes for table `turf_types`
+--
+ALTER TABLE `turf_types`
+  ADD PRIMARY KEY (`type_id`),
+  ADD KEY `turf_id` (`turf_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `admins`
+--
+ALTER TABLE `admins`
+  MODIFY `admin_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `bookings`
+--
+ALTER TABLE `bookings`
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT for table `owners`
+--
+ALTER TABLE `owners`
+  MODIFY `owner_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `payments`
+--
+ALTER TABLE `payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `sign up`
+--
+ALTER TABLE `sign up`
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tournaments`
+--
+ALTER TABLE `tournaments`
+  MODIFY `tournament_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `tournament_requests`
+--
+ALTER TABLE `tournament_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `turfs`
+--
+ALTER TABLE `turfs`
+  MODIFY `turf_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `turf_types`
+--
+ALTER TABLE `turf_types`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(80) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`);
+
+--
+-- Constraints for table `tournaments`
+--
+ALTER TABLE `tournaments`
+  ADD CONSTRAINT `tournaments_ibfk_1` FOREIGN KEY (`turf_id`) REFERENCES `turfs` (`turf_id`);
+
+--
+-- Constraints for table `tournament_requests`
+--
+ALTER TABLE `tournament_requests`
+  ADD CONSTRAINT `tournament_requests_ibfk_1` FOREIGN KEY (`turf_id`) REFERENCES `turfs` (`turf_id`),
+  ADD CONSTRAINT `tournament_requests_ibfk_2` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`owner_id`);
+
+--
+-- Constraints for table `turfs`
+--
+ALTER TABLE `turfs`
+  ADD CONSTRAINT `turfs_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`owner_id`);
+
+--
+-- Constraints for table `turf_types`
+--
+ALTER TABLE `turf_types`
+  ADD CONSTRAINT `turf_types_ibfk_1` FOREIGN KEY (`turf_id`) REFERENCES `turfs` (`turf_id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
