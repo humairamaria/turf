@@ -2,28 +2,27 @@
 session_start();
 include('connect.php');
 
-// Check if owner is logged in
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Owner') {
     header('Location: login.php'); // Redirect to login page if not logged in
     exit;
 }
 
-// Get owner-specific turf ID (assuming each owner is associated with a single turf)
-// Adjust this logic if owners can manage multiple turfs.
+
 $owner_id = $_SESSION['owner_id']; // Assuming owner ID is stored in session
 $query_turf = "SELECT turf_id FROM turfs WHERE owner_id = '$owner_id'";
 $result_turf = mysqli_query($conn, $query_turf);
 $turf = mysqli_fetch_assoc($result_turf);
 $turf_id = $turf['turf_id'];
 
-// Fetch specific tournament details hosted by the owner's turf
+
 $query = "SELECT tournament_id, tournament_name, start_date, end_date FROM tournaments WHERE turf_id = '$turf_id'";
 $result = mysqli_query($conn, $query);
 
-// Logout logic
+
 if (isset($_GET['logout'])) {
     session_destroy();
-    header('Location: login.php'); // Redirect to login page after logout
+    header('Location: login.php'); 
     exit;
 }
 ?>
