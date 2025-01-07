@@ -8,7 +8,8 @@ include('connect.php');
 
 // Check if the owner is logged in
 if (!isset($_SESSION['owner_id'])) {
-    header("Location: login.php"); // Redirect to login if not logged in
+    echo "Session not set. Debug your login process.";
+    //header("Location: login.php"); // Redirect to login if not logged in
     exit;
 }
 
@@ -102,6 +103,25 @@ if ($result->num_rows == 0) {
         .logout-btn:hover {
             background-color: #c0392b;
         }
+        
+        .btn-container {
+            margin: 20px 0;
+            text-align: right;
+        }
+        
+        .tournament-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        
+        .tournament-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +129,10 @@ if ($result->num_rows == 0) {
     <div class="container">
         <h1>Welcome, <?php echo htmlspecialchars($owner_name); ?>!</h1>
         <h2>Owner Dashboard</h2>
+        
+        <div class="btn-container">
+            <a href="tournament_history.php" class="tournament-btn">Tournament History</a>
+        </div>
 
         <?php if (isset($message)) { echo "<p>" . htmlspecialchars($message) . "</p>"; } ?>
 
