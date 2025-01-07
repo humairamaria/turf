@@ -1,23 +1,20 @@
 <?php
 session_start();
-// Include database connection file
+
 include('connect.php');
 
-// Start session to handle logged-in owner
 
-
-// Check if the owner is logged in
 if (!isset($_SESSION['owner_id'])) {
     echo "Session not set. Debug your login process.";
-    //header("Location: login.php"); // Redirect to login if not logged in
+    header("Location: login.php"); 
     exit;
 }
 
-// Get the owner ID from session
+
 $owner_id =$_SESSION['owner_id'] ;
 
 
-// Fetch the owner's name using prepared statements
+
 $owner_query = "SELECT username FROM owners WHERE owner_id = ?";
 $owner_stmt = $conn->prepare($owner_query);
 $owner_stmt->bind_param("i", $owner_id);
@@ -31,14 +28,14 @@ if ($owner_result && $owner_result->num_rows > 0) {
     $owner_name = "Owner"; // Default name if not found
 }
 
-// Fetch turfs belonging to the logged-in owner with an 'accepted' status using prepared statements
+
 $query = "SELECT * FROM turfs WHERE owner_id = ? AND status = 'accepted'";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $owner_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Check if the owner has any accepted turfs
+
 if ($result->num_rows == 0) {
     $message = "You do not have any accepted turfs yet.";
 } else {
