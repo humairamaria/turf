@@ -131,7 +131,7 @@ if (isset($_GET['logout'])) {
         <h1>Tournament History</h1>
 
         <div class="btn-container">
-            <a href="owner_dashboard.php">Back to Dashboard</a>
+            <a href="owner_dashboard_login.php">Back to Dashboard</a>
             <a href="?logout=true">Logout</a>
         </div>
 
