@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Start transaction
         $conn->begin_transaction();
 
-        // Check if the slot exists in the bookings table
+        
         $check_sql = "SELECT 1 FROM bookings 
                       WHERE turf_id = ? 
                       AND booking_date = ? 
@@ -40,15 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $check_result = $check_stmt->get_result();
 
         if ($check_result->num_rows > 0) {
-            // Slot already exists in the bookings table
+           
             echo "<div class='message-container error'>
                     <div class='message-text'>The selected time slot is already booked.</div>
                     <button onclick='window.location.href=\"user_dashboard.php\"' class='back-btn'>Back to Dashboard</button>
                   </div>";
-            exit;  // Stop the process if the slot exists
+            exit;  
         }
 
-        // Insert the booking with 'hold' status since the slot is available
+       
         $insert_sql = "INSERT INTO bookings (turf_id, user_id, booking_date, time_slot, status) 
                        VALUES (?, ?, ?, ?, 'hold')";
         $insert_stmt = $conn->prepare($insert_sql);
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insert_stmt->execute();
         $booking_id = $insert_stmt->insert_id;
 
-        // If payment details are provided, update status to 'reserved'
+       
         if ($payment_method && $phone_number && $transaction_id && $amount) {
             $payment_sql = "INSERT INTO payments (booking_id, payment_method, phone_number, transaction_id, amount) 
                             VALUES (?, ?, ?, ?, ?)";
@@ -70,10 +70,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_stmt->execute();
         }
 
-        // Commit transaction
+    
         $conn->commit();
 
-        // Send email confirmation to the user
         $user_email_query = "SELECT email FROM users WHERE user_id = ?";
         $email_stmt = $conn->prepare($user_email_query);
         $email_stmt->bind_param("i", $user_id);
@@ -81,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email_result = $email_stmt->get_result();
         $user_email = $email_result->fetch_assoc()['email'];
 
-        // Get Turf Name for email body
+        
         $turf_name_query = "SELECT turf_name FROM turfs WHERE turf_id = ?";
         $turf_stmt = $conn->prepare($turf_name_query);
         $turf_stmt->bind_param("i", $turf_id);
@@ -89,7 +88,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $turf_result = $turf_stmt->get_result();
         $turf_name = $turf_result->fetch_assoc()['turf_name'];
 
-        // Prepare and send email
         $mail = new PHPMailer(true);
 
         try {
