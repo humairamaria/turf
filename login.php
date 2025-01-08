@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // SQL to check users, admins, and owners based on the username
     $sql = "SELECT 'User' AS role, username, password,user_id as id FROM users WHERE username = ?
             UNION
-            SELECT 'Admin' AS role, username, password, admin_id as id FROM  admins WHERE username = ?
+            SELECT 'Admin' AS role, username, password,admin_id as id FROM  admins WHERE username = ?
             UNION
             SELECT 'Owner' AS role, username, password,owner_id as id FROM owners WHERE username = ?";
     $stmt = $conn->prepare($sql);
@@ -60,72 +60,130 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Turf Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        /* General Reset and Body Styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            background: url('pcis/loginbg.jpg') no-repeat center center/cover;
+            overflow: hidden;
+    
         }
 
+        /* Background Blur Effect */
+        .background-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: blur(3px);
+        }
+
+        /* Login Container Styling */
         .login-container {
-            background-color: #fff;
-            padding: 20px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 400px;
+            background: rgba(255, 255, 255, 0.16); /* Transparent white for a modern look */
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
+            width: 70%;
+            max-width: 350px;
+            animation: fadeIn 0.9s ease-in-out;
+            transition:transform 0.3s , box-shadow 0.3s;
+            
         }
 
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Styling */
         .login-container h1 {
-            margin-bottom: 20px;
-            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color:rgb(255, 255, 255);
+            font-weight: 600;
         }
 
+        /* Input and Button Styling */
         .login-container input, .login-container button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: none;
+            border-radius: 10px;
             box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .login-container input {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .login-container input:focus {
+            border-color: #1abc9c;
+            outline: none;
+            box-shadow: 0 0 8px rgba(26, 188, 156, 0.4);
         }
 
         .login-container button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
+            background-color:rgb(57, 101, 61);
+            color: #fff;
+            font-weight: 600;
+            font-family: 'Roboto', sans-serif;
             cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .login-container button:hover {
-            background-color: #45a049;
+            background-color: #16a085;
+            box-shadow: 0px 5px 15px rgba(26, 188, 156, 0.4);
         }
 
+        /* Link Styling */
         .login-container p {
-            margin-top: 10px;
+            margin: 15px 0 0;
+            font-size: 0.9rem;
             color: #666;
         }
 
         .login-container p a {
-            color: #4CAF50;
+            color: rgb(57, 101, 61);
             text-decoration: none;
+            font-weight: 500;
         }
 
         .login-container p a:hover {
             text-decoration: underline;
         }
 
+        /* Message Styling */
         .message {
             padding: 10px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         .error {
@@ -139,11 +197,35 @@ $conn->close();
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(73, 67, 131, 0.9);
+        }
     </style>
 </head>
 <body>
+    <!-- Background Blur -->
+    <img src="pcis/loginbg.jpg" alt="Background Image" class="background-blur">
+
     <div class="login-container">
-        <h1>Login</h1>
+        <h1>Welcome Back</h1>
         <?php if (isset($error)): ?>
             <p class="message error"><?php echo $error; ?></p>
         <?php endif; ?>
@@ -151,8 +233,13 @@ $conn->close();
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
-            <p>Don't have an account? <a href="signup_user.php">Sign Up</a></p>
+            <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
         </form>
+    </div>
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="pcis/login.mp4" type="video/mp4">
+        </video>
     </div>
 </body>
 </html>
