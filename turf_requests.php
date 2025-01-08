@@ -4,7 +4,7 @@ include('connect.php');
 
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
-    header('Location: login.php'); // Redirect to login page if not logged in
+    header('Location: login.php');
     exit;
 }
 
